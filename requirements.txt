@@ -1,0 +1,6 @@
+requests
+django
+django-allauth
+cryptography
+djangorestframework-jwt
+django-environ
