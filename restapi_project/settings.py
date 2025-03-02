@@ -80,15 +80,16 @@ ASGI_APPLICATION = "restapi_project.asgi.application"
 
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.environ.get("SUPABASE_DB_NAME"),
-        "USER": os.environ.get("SUPABASE_DB_USER"),
-        "PASSWORD": os.environ.get("SUPABASE_DB_PASSWORD"),
-        "HOST": os.environ.get("SUPABASE_DB_HOST"),
-        "PORT": os.environ.get("SUPABASE_DB_PORT", "5432"),
+        "NAME": os.environ.get("POSTGRES_DATABASE"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "HOST": os.environ.get("POSTGRES_HOST"),
+        "PORT": os.environ.get(
+            "POSTGRES_PORT", "5432"
+        ),  # You might need to add this to your .env if it is not 5432.
     }
 }
 
