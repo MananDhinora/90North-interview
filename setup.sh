@@ -1,17 +1,14 @@
 #!/bin/bash
 
-source myenv/bin/activate
+#install dependancies
+pip install setuptools
+pip install -r reqirements.txt
 
 # Run makemigrations
-echo "Running makemigrations..."
 python manage.py makemigrations
-
-# Run migrate
-echo "Running migrate..."
 python manage.py migrate
-
+python manage.py collectstatic
 # Create superuser 'foo'
-echo "Creating superuser 'foo'..."
 python manage.py createsuperuser --noinput --username foo --email "" --password "$FOO_PASSWORD"
 
 #Create superuser 'demo'
