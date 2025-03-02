@@ -1,0 +1,13 @@
+{
+    "builds": [{
+        "src": "restapi_project/asgi.py",
+        "use": "@vercel/python",
+        "config": { "maxLambdaSize": "600mb", "runtime": "python3.12" }
+    }],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "restapi_project/asgi.py"
+        }
+    ]
+}

@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure-a4g_srz&00_7g!!du&*h2wd4vf%k4x476ii9ul)c=@@@!-q8ux
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [".vercel.app"]
 
 INSTALLED_APPS = [
     "daphne",
@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     "google_apis",
 ]
 
-ASGI_APPLICATION = "restapi_project.asgi.application"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -75,6 +74,7 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = "restapi_project.asgi.application"
 # WSGI_APPLICATION = "restapi_project.wsgi.application"
 
 

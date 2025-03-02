@@ -15,3 +15,6 @@ application = ProtocolTypeRouter(
         "websocket": AuthMiddlewareStack(URLRouter(routing.websocket_urlpatterns)),
     }
 )
+
+# for vercel deployment
+app = application
