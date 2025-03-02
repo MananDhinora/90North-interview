@@ -1,6 +1,8 @@
-requests
+google-api-python-client
+google_auth_oauthlib
+djangorestframework
 django
-django-allauth
-cryptography
-djangorestframework-jwt
-django-environ
+# django-channels
+channels
+daphne
+dotenv

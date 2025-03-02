@@ -1,0 +1,9 @@
+services:
+  classroom_flask_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flask_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"

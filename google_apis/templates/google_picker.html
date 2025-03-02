@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Picker</title>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <script>
+        // Global variables
+        let pickerApiLoaded = false;
+        let oauthToken = null;
+
+        function onApiLoad() {
+            gapi.load('picker', {'callback': onPickerApiLoad});
+            // First authenticate using your Django backend
+            initiateAuthFlow();
+        }
+
+        function onPickerApiLoad() {
+            pickerApiLoaded = true;
+        }
+
+        function initiateAuthFlow() {
+            // Use the correct path with /google/ prefix
+            fetch('/google/auth/token/', {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    oauthToken = data.token;
+                } else {
+                    // Use the correct path with /google/ prefix
+                    window.location.href = '/google/auth/login/?next=' + encodeURIComponent(window.location.pathname);
+                }
+            })
+            .catch(error => {
+                console.error('Authentication error:', error);
+                document.getElementById('status').innerHTML = 'Authentication error. Check console for details.';
+            });
+        }
+
+        function createPicker() {
+            var picker = new google.picker.PickerBuilder()
+                .addView(google.picker.ViewId.DOCS)
+                .setOAuthToken(oauthToken)
+                .setCallback(pickerCallback)
+                .build();
+            picker.setVisible(true);
+        }
+
+        function pickerCallback(data) {
+            if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+                var docs = data[google.picker.Response.DOCUMENTS];
+                var fileId = docs[0].id;  // Get the file ID of the selected document
+                var fileName = docs[0].name;
+                console.log("Selected file ID: " + fileId);
+                // Send the file_id to the server
+                downloadFile(fileId, fileName);
+            }
+        }
+
+        function downloadFile(fileId, fileName) {
+            fetch('/google/google-picker/download/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken'), // Ensure CSRF token is included
+                },
+                body: 'file_id=' + encodeURIComponent(fileId),
+            })
+            .then((response) => response.blob())
+            .then((blob) => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName; // Use the filename from metadata
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            })
+            .catch((error) => {
+                console.error('Download error:', error);
+            });
+        }
+
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + '=') {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function openPicker() {
+            if (pickerApiLoaded && oauthToken) {
+                createPicker();
+            } else {
+                console.log("Picker API or OAuth token not ready.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Google Picker</h1>
+    <div id="status"></div>
+
+    <p>Download from Google Drive</p>
+    <button onclick="openPicker()">Open Picker</button>
+
+    <form method="post" action="/google/google-picker/upload/" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="myfile">Select a file:</label>
+        <input type="file" id="myfile" name="myfile">
+        <button type="submit">Upload</button>
+    </form>
+
+    <script>
+        // Load the API on page load
+        onApiLoad();
+    </script>
+</body>
+</html>

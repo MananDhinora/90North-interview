@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google API Access</title>
+</head>
+<body>
+    <h1>Google API Access</h1>
+
+    <p>
+        <a href="{% url 'authorize' %}">Authorize with Google</a>
+    </p>
+
+    <p>
+        <a href="{% url 'clear_credentials' %}">Clear Credentials (Logout)</a>
+    </p>
+
+    <p>
+        <a href="{% url 'google_picker' %}">Get Drive Files (JSON)</a>
+    </p>
+
+    <p>
+        <a href="{% url 'userinfo' %}">User Information</a>
+    </p>
+
+    <script>
+
+        // Example JavaScript to handle the User Info response (JSON)
+        document.querySelector('a[href="{% url 'userinfo' %}"]').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+            fetch("{% url 'userinfo' %}")
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Log the JSON data to the console
+                    displayUserInfo(data);
+                })
+                .catch(error => console.error('Error fetching user info:', error));
+        });
+
+        function displayUserInfo(info) {
+          const userInfoDiv = document.createElement('div');
+          userInfoDiv.innerHTML = `
+            <p>Token: ${info.token}</p>
+            <p>Refresh Token: ${info.refresh_token}</p>
+            <p>Token URI: ${info.token_uri}</p>
+            <p>Client ID: ${info.client_id}</p>
+            <p>Granted Scopes: ${info.granted_scopes}</p>
+          `;
+          document.body.appendChild(userInfoDiv);
+        }
+
+    </script>
+</body>
+</html>
