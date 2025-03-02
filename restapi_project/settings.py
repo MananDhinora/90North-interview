@@ -83,9 +83,12 @@ CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        # "NAME": BASE_DIR / "db.sqlite3",
-        "NAME": ":memory:",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.environ.get("SUPABASE_DB_NAME"),
+        "USER": os.environ.get("SUPABASE_DB_USER"),
+        "PASSWORD": os.environ.get("SUPABASE_DB_PASSWORD"),
+        "HOST": os.environ.get("SUPABASE_DB_HOST"),
+        "PORT": os.environ.get("SUPABASE_DB_PORT", "5432"),
     }
 }
 
