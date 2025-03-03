@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Message
 from django.db.models import Q
-from datetime import datetime
+from django.utils import timezone
 
 
 @login_required
@@ -32,7 +32,7 @@ def chat_room(request, room_name):
 
     user_last_messages.sort(
         key=lambda x: (
-            x["last_message"].timestamp if x["last_message"] else datetime.min
+            x["last_message"].timestamp if x["last_message"] else timezone.min
         ),
         reverse=True,
     )
