@@ -7,15 +7,13 @@ from django.db.models import Q
 
 @login_required
 def chat_room(request, room_name):
-    search_query = request.GET.get("search", "")
+    """used to retrive chat history and render the gui"""
     users = User.objects.exclude(id=request.user.id)
     chats = Message.objects.filter(
         (Q(sender=request.user) & Q(receiver__username=room_name))
         | (Q(receiver=request.user) & Q(sender__username=room_name))
     )
 
-    if search_query:
-        chats = chats.filter(Q(content__icontains=search_query))
     chats = chats.order_by("timestamp")
     user_last_messages = []
 
@@ -44,6 +42,5 @@ def chat_room(request, room_name):
             "chats": chats,
             "users": users,
             "user_last_messages": user_last_messages,
-            "search_query": search_query,
         },
     )

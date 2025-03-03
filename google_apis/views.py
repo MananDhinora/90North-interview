@@ -18,16 +18,14 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.shortcuts import redirect, render, reverse
-
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_exempt
 
 # Local imports
 from .models import RefreshToken
 
 # Configuration settings
 
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = (
-    "1"  # to handle oauth2callback without https
-)
 SCOPES = [
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/drive.metadata",
@@ -67,7 +65,8 @@ def google_picker_callback(request):
 
 
 def upload_file(request):
-    """Upload a file to Google Drive using the user's refresh token."""
+    """Upload a file to Google Drive"""
+
     if request.method != "POST":
         return HttpResponse("Method not allowed.")
 
@@ -76,20 +75,13 @@ def upload_file(request):
     if not myfile:
         return HttpResponse("No file was uploaded.")
 
-    if "credentials" not in request.session:
-        return HttpResponse("User not authenticated. Please authorize first.")
-
-    # Get user's refresh token
-    try:
-        refresh_token = RefreshToken.objects.get(
-            user=User.objects.get(username=request.session.get("user_info")["name"])
-        ).refresh_token
-    except RefreshToken.DoesNotExist:
-        return HttpResponse("Refresh token not found.")
-    except User.DoesNotExist:
-        return HttpResponse("User not found.")
-    except KeyError:
-        return HttpResponse("User info not found in session.")
+    if "credentials" in request.session:
+        try:
+            refresh_token = RefreshToken.objects.get(
+                user=User.objects.get(username=request.session.get("user_info")["name"])
+            ).refresh_token
+        except Exception as e:
+            return HttpResponse(e)
 
     if not refresh_token:
         return HttpResponse("Refresh token not found.")
@@ -148,6 +140,7 @@ def upload_file(request):
 
 
 def download_file(request):
+    """Upload a file to Google Drive"""
     try:
         refresh_token = RefreshToken.objects.get(
             user=User.objects.get(username=request.session.get("user_info")["name"])
@@ -200,8 +193,9 @@ def authorize(request):
     return redirect(authorization_url)
 
 
+@csrf_exempt
 def oauth2callback(request):
-    """Handle the OAuth2 callback from Google."""
+    """Handle the OAuth2 callback from Google"""
     state = request.session.get("state")
     received_state = request.GET.get("state")
     if state != received_state:
@@ -214,12 +208,11 @@ def oauth2callback(request):
     authorization_response = request.build_absolute_uri()
     flow.fetch_token(authorization_response=authorization_response)
 
-    # Store credentials and user info
+    # Store credentials and user info in the sessionid cookie
     credentials = flow.credentials
     request.session["credentials"] = credentials_to_dict(credentials)
     request.session["features"] = check_granted_scopes(credentials)
 
-    # Get user information
     user_info = (
         flow.authorized_session()
         .get("https://www.googleapis.com/oauth2/v1/userinfo")
@@ -230,10 +223,10 @@ def oauth2callback(request):
     # Create or get user
     username = user_info.get("name")
     if " " in username:
-        username =  username.replace(" ", "")
+        username = username.replace(" ", "")
 
     email = user_info.get("email")
-    password = user_info.get("email")  # Note: Using email as password is not secure
+    password = user_info.get("email")
 
     try:
         user = User.objects.get(username=username)
@@ -261,7 +254,6 @@ def oauth2callback(request):
 
     except Exception as e:
         messages.error(request, f"Error creating/updating refresh token: {e}")
-
     return redirect(request.session.get("next_url", "index"))
 
 
@@ -328,3 +320,12 @@ def get_auth_token(request):
 
     credentials_dict = request.session["credentials"]
     return JsonResponse({"authenticated": True, "token": credentials_dict["token"]})
+
+
+def get_csrf_token(request):
+    """Return the CSRF token."""
+
+    csrf_token = get_token(request)
+    if csrf_token:
+        return JsonResponse({"csrf_token": csrf_token})
+    return HttpResponse(f"no csrf token in session", status=404)

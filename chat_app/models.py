@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Message(models.Model):
+    """Model to create a db table to store all the messages"""
     sender = models.ForeignKey(
         User, related_name="sent_messages", on_delete=models.CASCADE
     )

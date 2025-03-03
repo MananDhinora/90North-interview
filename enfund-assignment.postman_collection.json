@@ -1,0 +1,113 @@
+{
+	"info": {
+		"_postman_id": "990ce431-cdcc-408d-a132-fc140a7ad66b",
+		"name": "enfund-assignment",
+		"description": "**google-auth-init**: this is an end point that accepts post requests to init the google auth flow\n\n- **request**:\n    \n    - headers:\n        \n        - \"X-CSRFToken\": PVWFQhUC7eL8ve5j9PCdBZFPLWlhZeRJAjrH52LH0MEB8CG4rcupMTamPNd1MONJ\n            \n    - BODY: empty\n        \n- **response**: redirect to the google login page\n    \n\n**google-auth-callback**: this endpoint will receivie the post request containing the \"code\" query parameter sent from the google oauth server\n\n- **request:**\n    \n    - url: [http://127.0.0.1:8000/google/auth/login/callback/?code=](http://127.0.0.1:8000/google/auth/login/callback/?code)\n        \n- **response**:\n    \n    - {\"access_token\": credentials.token, \"refresh_token\":credentials.refresh_token, \"token_type\": \"Bearer\", \"expires_in\":expiery_time, \"user_info\": user_info}\n        \n\n**get-csrf_token**: this endpoint wil accept a get request and respond with a csrf_token which is used in the header _X-CSRFToken_\n\n- request: empty\n    \n- response:{\"csrf_token\":\"PVWFQhUC7eL8ve5j9PCdBZFPLWlhZeRJAjrH52LH0MEB8CG4rcupMTamPNd1MONJ\"}\n    \n\n**google-drive-upload**: this is an endpoint that accepts post requests which contain an uploaded file in the form along with 2 cookies: csrftoken, sessionid and a special header _X-CSRFToken and for auth:_\n\nuse the postman OAuth2 helper to gain the access token to access the users google drive\n\n- **request:**\n    \n    - postman config:\n        \n        - go to body>form-data>\n            \n        - now add the key \"myfile\"\n            \n        - change type from text -> file\n            \n        - select any file or the one included in the collection\n            \n    - Headers:\n        \n        - _ADD:_ \"X-CSRFToken\": PVWFQhUC7eL8ve5j9PCdBZFPLWlhZeRJAjrH52LH0MEB8CG4rcupMTamPNd1MONJ\n            \n    - cookies:\n        \n        - csrftoken(can be optained from the browser after logging in via google)\n            \n        - sessionid(can be optained from the browser after logging in via google)\n            \n- response:\n    \n    - uploaded to Google Drive with ID {gdrive id of the uploaded file}\n        \n\n**google-drive-download:** here we need to pass file_id along with 2 cookies the header and the auth token from google(use postman oauth2 helper) the provided file_id will be downloaded\n\n- request:\n    \n    - body\n        \n        - postmancofig\n            \n            - go to body>www-form-encodedurl\n                \n            - add \"file_id\": \"{google drive id of the file that is to be downloaded }\"\n                \n    - Headers:\n        \n        - _ADD:_ \"X-CSRFToken\": PVWFQhUC7eL8ve5j9PCdBZFPLWlhZeRJAjrH52LH0MEB8CG4rcupMTamPNd1MONJ\n            \n    - cookies:\n        \n        - csrftoken(can be optained from the browser after logging in via google)\n            \n        - sessionid(can be optained from the browser after logging in via google)\n            \n- response:\n    \n    - the requested file is downloaded\n        \n\n**NOTE:** Currently, postman doesn't allow the export of websocket requests hence I am unable to share its collection. However, you can use the gui provided, but if you wat me to share the collection please provide an email ID to add as a collaborator on the postman project.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "33827524"
+	},
+	"item": [
+		{
+			"name": "google-auth-init",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "PVWFQhUC7eL8ve5j9PCdBZFPLWlhZeRJAjrH52LH0MEB8CG4rcupMTamPNd1MONJ",
+						"type": "text"
+					}
+				],
+				"url": "https://enfund-assignment.vercel.app/google/auth/login/"
+			},
+			"response": []
+		},
+		{
+			"name": "google-auth-callback",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "https://enfund-assignment.vercel.app/google/auth/login/callback/"
+			},
+			"response": []
+		},
+		{
+			"name": "get-csrf_token",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": "https://enfund-assignment.vercel.app/google/csrf_token/"
+			},
+			"response": []
+		},
+		{
+			"name": "google-drive-upload",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "Wz6KSDcDODFNv9lOl1sXx7q1xzNr01rwHXBM7o3IHbyg8xWzDok9I1VyBqFbNBnw",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "myfile",
+							"type": "file",
+							"src": "/C:/Users/dhino/Downloads/wallpapers/bliss+pixels.png"
+						},
+						{
+							"key": "",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						}
+					]
+				},
+				"url": "https://enfund-assignment.vercel.app/google/google-picker/upload/"
+			},
+			"response": []
+		},
+		{
+			"name": "google-drive-download",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "F0i55cQnFkOUPOtuVChqO7xWLU0ILQX3qoN7kXHsySHnsc4fdZ9CZ12tPLSsyqT3",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "file_id",
+							"value": "12FKNetUYtIFa4E582sfESBNHsKf_ZnXO",
+							"type": "text"
+						}
+					]
+				},
+				"url": "https://enfund-assignment.vercel.app/google/google-picker/download/"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "file_id",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

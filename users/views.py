@@ -6,6 +6,7 @@ from django.contrib import messages
 
 
 def login_page(request):
+    """used login to chat_app"""
     if request.user.is_authenticated:
         return redirect(f"/chat/{request.user.username}/")
 
@@ -26,12 +27,14 @@ def login_page(request):
 
 @login_required
 def logout_page(request):
+    """logout user"""
     logout(request)
     messages.success(request, "You have been logged out successfully.")
     return redirect("/")
 
 
 def signup_view(request):
+    """used to make new users for chat_app"""
     if request.user.is_authenticated:
         return redirect(f"/chat/{request.user.username}/")
 
