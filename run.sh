@@ -9,4 +9,4 @@ python manage.py shell -c "from django.contrib.auth.models import User; User.obj
 python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_user(username='jeff', password='asdf')"
 
 # Run the development server
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8000
