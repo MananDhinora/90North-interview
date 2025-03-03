@@ -25,7 +25,7 @@ A set of APIs that implement the Google OAuth flow, Google Drive v3, and a real-
   - Clone the repository.
 
     ```
-    git clone [https://github.com/MananDhinora/enfund-assignment.git](https://github.com/MananDhinora/enfund-assignment.git)
+    git clone https://github.com/MananDhinora/enfund-assignment.git
     ```
 
 ### Spinning up container
