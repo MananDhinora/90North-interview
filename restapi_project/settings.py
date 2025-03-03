@@ -10,7 +10,6 @@ CLIENT_SECRETS_FILE = os.path.join(os.path.dirname(__file__), "client_secret.jso
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 DEBUG = True
 
