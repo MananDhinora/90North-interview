@@ -32,7 +32,7 @@ def chat_room(request, room_name):
 
     user_last_messages.sort(
         key=lambda x: (
-            x["last_message"].timestamp if x["last_message"] else timezone.min
+            x["last_message"].timestamp if x["last_message"] else timezone.now()
         ),
         reverse=True,
     )
